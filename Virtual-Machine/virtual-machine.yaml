@@ -1,0 +1,53 @@
+---
+- name: Create a Virtual Machine in Azure with updated values
+  hosts: localhost
+  tasks:
+    - name: Create a resource group
+      azure_rm_resourcegroup:
+        name: "new-resource-group"
+        location: "West US"
+
+    - name: Create a virtual network
+      azure_rm_virtualnetwork:
+        resource_group: "new-resource-group"
+        name: "new-virtual-network"
+        address_prefixes: "192.168.0.0/16"
+        location: "West US"
+
+    - name: Create a subnet
+      azure_rm_subnet:
+        resource_group: "new-resource-group"
+        name: "new-subnet"
+        address_prefix: "192.168.1.0/24"
+        virtual_network: "new-virtual-network"
+
+    - name: Create a public IP address
+      azure_rm_publicipaddress:
+        resource_group: "new-resource-group"
+        name: "new-public-ip"
+        location: "West US"
+        allocation_method: Static
+
+    - name: Create a network interface
+      azure_rm_networkinterface:
+        resource_group: "new-resource-group"
+        name: "new-network-interface"
+        location: "West US"
+        subnet: "new-subnet"
+        virtual_network: "new-virtual-network"
+        public_ip_name: "new-public-ip"
+
+    - name: Create a virtual machine
+      azure_rm_virtualmachine:
+        resource_group: "new-resource-group"
+        name: "new-virtual-machine"
+        location: "West US"
+        vm_size: "Standard_DS1_v2"
+        admin_username: "newadmin"
+        admin_password: "ComplexPassword@123" # Ensure this meets complexity requirements
+        network_interfaces: "new-network-interface"
+        image:
+          offer: "WindowsServer"
+          publisher: "MicrosoftWindowsServer"
+          sku: "2019-Datacenter"
+          version: "latest"
